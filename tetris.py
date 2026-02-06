@@ -36,15 +36,21 @@ def run():
     eventbus = EventBus()
 
     while True:
-        view(model)
-        if model.is_GameOver():
-            break
-
-        eventbus.emit(input_adapter.get_event())
-        model = updater(model, eventbus)
-        eventbus.end_tick()
-        
+        if run_gameloop_once(model, updater, view, input_adapter, eventbus):
+            break        
     print("Bye!")
+
+# 外部ゲームループから呼ばれるメイン処理
+def run_gameloop_once(model, updater, view, input_adapter, eventbus):
+    view(model)
+    if model.is_GameOver():
+        return True
+
+    eventbus.emit(input_adapter.get_event())
+    model = updater(model, eventbus)
+    eventbus.end_tick()
+    return False
+    
 
 if __name__ == "__main__":
     run()

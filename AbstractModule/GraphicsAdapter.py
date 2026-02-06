@@ -14,6 +14,7 @@ class ViewModel:
     cells: List[List[int]]  # 0=空, >0=ブロック
     score: int
     lines: int
+    level: int
     game_over: bool
 
 class ConsoleGraphicsAdapter:
@@ -25,7 +26,7 @@ class ConsoleGraphicsAdapter:
 
     def render(self, vm: ViewModel) -> None:
         self._clear_screen()
-        print(f"SCORE: {vm.score}   LINES: {vm.lines}")
+        print(f"SCORE: {vm.score}   LINES: {vm.lines}   LEVEL: {vm.level}")
         print("+" + "--" * vm.width + "+")
         for row in vm.cells:
             line = "|"

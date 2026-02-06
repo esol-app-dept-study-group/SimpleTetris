@@ -21,6 +21,7 @@ class SampleView(ViewBase):
             cells=tmp,
             score=state.score,
             lines=state.lines,
+            level=state.level,
             game_over=state.game_over,
         )
         # GraphicsAdapter のAPIコール

@@ -9,4 +9,5 @@ class GameView:
 
     def __call__(self, state: GameModel):
         for view in self.subViewList:
-            return view(state)
+            state = view(state)
+        return state

@@ -10,6 +10,7 @@ class GameModel:
     next_queue: List[str]
     score: int = 0
     lines: int = 0
+    level: int = 1
     game_over: bool = False
 
     def __init__(self, matrix: Matrix, active_piece: Tetromino, active_pos: Point, next_queue: List[str]):
