@@ -1,10 +1,10 @@
 from SimpleTetris.view_base import ViewBase
 from SimpleTetris.GameModel import GameModel
-from SimpleTetris.AbstractModule.GraphicsAdapter import GraphicsAdapter, ViewModel
+from SimpleTetris.AbstractModule.GraphicsAdapter import GraphicsAdapter, ConsoleGraphicsAdapter, ViewModel
 
 class SampleView(ViewBase):
-    def __init__(self):
-        self.gfx = GraphicsAdapter()
+    def __init__(self, gfx: GraphicsAdapter = None):
+        self.gfx = gfx if gfx is not None else ConsoleGraphicsAdapter()
     def __call__(self, state: GameModel):
         # 固定ブロック＋落下中ピースを合成した一時ボードを作る
         tmp = [row[:] for row in state.matrix.cells]
@@ -22,6 +22,7 @@ class SampleView(ViewBase):
             score=state.score,
             lines=state.lines,
             level=state.level,
+            goal=state.goal,
             game_over=state.game_over,
         )
         # GraphicsAdapter のAPIコール

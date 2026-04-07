@@ -1,13 +1,7 @@
 # tetris_example.py
 from __future__ import annotations
-from enum import Enum, auto
-from typing import List, Tuple, Dict, Optional
-import random
 import os
 import sys
-import time
-import pygame
-from pygame.locals import *
 
 # Allow running both as `python -m tetris.tetris` and `python tetris/tetris.py`
 if __package__ is None or __package__ == "":
@@ -20,8 +14,7 @@ if __package__ is None or __package__ == "":
         sys.path.remove(pkg_dir)
     sys.path.insert(0, parent_dir)
     __package__ = "SimpleTetris"
-from SimpleTetris.AbstractModule.GraphicsAdapter import GraphicsAdapter
-from SimpleTetris.AbstractModule.InputAdapter import InputAdapter
+from SimpleTetris.AbstractModule.Platform import TkinterPlatform, ConsolePlatform, ConsolePygamePlatform
 from SimpleTetris.GameModel import GameModel
 from SimpleTetris.GameView import GameView
 from SimpleTetris.GameUpdater import GameUpdater
@@ -31,23 +24,20 @@ from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
 # メインループ
 # ============================================================
 def run():
-    # pygameの初期化
-    pygame.init()                                   # Pygameの初期化
-    screen = pygame.display.set_mode((1, 1), pygame.NOFRAME)
-    pygame.display.set_caption("SimpleTetris")              # 画面上部に表示するタイトルを設定
-    
-    # ゲームロジック用のオブジェクト群を生成
+    platform = TkinterPlatform()          # ここを差し替えるだけでバックエンドが切り替わる
+    #platform = ConsolePlatform()           # ここを差し替えるだけでバックエンドが切り替わる
+    #platform = ConsolePygamePlatform()      # ここを差し替えるだけでバックエンドが切り替わる
+
     model = GameModel.initial()
     updater = GameUpdater()
-    view = GameView()
-    input_adapter = InputAdapter()
+    view = GameView(platform.graphics)   # gfx を DI
     eventbus = EventBus()
 
-    while True:
-        if run_gameloop_once(model, updater, view, input_adapter, eventbus):
-            break
+    def tick() -> bool:
+        return run_gameloop_once(model, updater, view, platform.input, eventbus)
 
-    pygame.quit()
+    platform.start_loop(tick, interval_ms=200)
+    platform.quit()
     print("Bye!")
 
 # 外部ゲームループから呼ばれるメイン処理

@@ -1,12 +1,21 @@
 import pygame
 from pygame.locals import *
+from abc import ABC, abstractmethod
+import tkinter
 from SimpleTetris.eventdef import GameEvent
 
 # ============================================================
-# アダプタ層: 入力（コンソール）
+# アダプタ層: 入力
 # ============================================================
 
-class ConsoleInputAdapter:
+class InputAdapter(ABC):
+    """入力アダプタの基底クラス"""
+
+    @abstractmethod
+    def get_event(self) -> list[GameEvent]: ...
+
+
+class ConsoleInputAdapter(InputAdapter):
     """
     実際の入力を読み取り、Command に変換する。
     - a: 左
@@ -37,7 +46,7 @@ class ConsoleInputAdapter:
             ret.append(GameEvent.INPUTEVENT_TICK)
         return ret
 
-class PygameInputAdapter:
+class PygameInputAdapter(InputAdapter):
     def get_event(self) -> list[GameEvent]:
         ret = []
         # イベント処理
@@ -63,9 +72,38 @@ class PygameInputAdapter:
                     ret.append( GameEvent.INPUTEVENT_HARD_DROP )
         ret.append(GameEvent.INPUTEVENT_TICK)
         return ret
-    
-class InputAdapter:
-    def __init__(self):
-        self.core = PygameInputAdapter()
+
+
+class TkinterInputAdapter(InputAdapter):
+    """tkinter ウィンドウのキーイベントを GameEvent に変換する。
+    root.bind でキーを受け取り、get_event() 呼び出し時にバッファを返す。
+    """
+
+    _KEY_MAP = {
+        # 矢印キー
+        "Left":   GameEvent.INPUTEVENT_LEFT,
+        "Right":  GameEvent.INPUTEVENT_RIGHT,
+        "Up":     GameEvent.INPUTEVENT_ROTATE,
+        "Down":   GameEvent.INPUTEVENT_SOFT_DROP,
+        # WASD（メンバー実装より）
+        "a":      GameEvent.INPUTEVENT_LEFT,
+        "d":      GameEvent.INPUTEVENT_RIGHT,
+        "w":      GameEvent.INPUTEVENT_ROTATE,
+        "s":      GameEvent.INPUTEVENT_SOFT_DROP,
+        "space":  GameEvent.INPUTEVENT_HARD_DROP,
+        "Escape": GameEvent.INPUTEVENT_QUIT,
+    }
+
+    def __init__(self, root: tkinter.Tk):
+        self._buf: list[GameEvent] = []
+        for key, event in self._KEY_MAP.items():
+            root.bind(f"<{key}>", lambda e, ev=event: self._buf.append(ev))
+        # ウィンドウの×ボタン
+        root.protocol("WM_DELETE_WINDOW", lambda: self._buf.append(GameEvent.INPUTEVENT_QUIT))
+
     def get_event(self) -> list[GameEvent]:
-        return self.core.get_event()
+        events = self._buf.copy()
+        self._buf.clear()
+        events.append(GameEvent.INPUTEVENT_TICK)
+        return events
+

@@ -16,4 +16,5 @@ class GameLogicLevelUpdater(UpdaterBase):
                 # 【仮実装】実際はラインクリアのイベントが来ると思うがTICKでお試し。
                 calculated_level = (state.lines // GAME_LEVEL_UP_LINES) + 1
                 state.level = min(calculated_level, GAME_LEVEL_MAX)
+                state.goal = GAME_LEVEL_UP_LINES - (state.lines % GAME_LEVEL_UP_LINES)
         return state

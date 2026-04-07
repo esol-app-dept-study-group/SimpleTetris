@@ -3,6 +3,8 @@ from SimpleTetris.sample.SampleUpdater import SampleUpdater
 from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
 from SimpleTetris.GameModel import GameModel
 from SimpleTetris.GameLogicLevel.GameLogicLevelUpdater import GameLogicLevelUpdater
+from SimpleTetris.GameLogicTetrimino.GameLogicTetriminoUpdater import GameLogicTetriminoUpdater
+from SimpleTetris.GameLogicNextMino.GameLogicNextMinoUpdater import GameLogicNextMinoUpdater
 
 
 class GameUpdater:
@@ -10,6 +12,8 @@ class GameUpdater:
         self.subUpdaterList = [
             SampleUpdater(),
             GameLogicLevelUpdater(),
+            GameLogicNextMinoUpdater(),
+            GameLogicTetriminoUpdater(),
         ]
 
     def __call__(self, state: GameModel, event: EventBus) -> GameModel:
