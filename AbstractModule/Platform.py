@@ -8,7 +8,7 @@ import pygame
 from pygame.locals import *
 
 from SimpleTetris.AbstractModule.GraphicsAdapter import (
-    GraphicsAdapter, ConsoleGraphicsAdapter, TkinterGraphicsAdapter,
+    GraphicsAdapter, ConsoleGraphicsAdapter, TkinterGraphicsAdapter, PygameGraphicsAdapter,
 )
 from SimpleTetris.AbstractModule.InputAdapter import (
     InputAdapter, ConsoleInputAdapter, PygameInputAdapter, TkinterInputAdapter,
@@ -137,3 +137,40 @@ class TkinterPlatform(Platform):
 
     def quit(self) -> None:
         pass
+
+class PygamePlatform(Platform):
+    """Pygame 描画 + Pygame キー入力。
+    """
+
+    def __init__(self):
+        # pygame ウインドウ
+        pygame.init()
+        screen = pygame.display.set_mode((400, 600))
+        pygame.display.set_caption("SimpleTetris")
+        pygame.display.flip()
+
+        # Adapter を生成して root を DI
+        self._gfx = PygameGraphicsAdapter(screen)
+        self._inp = PygameInputAdapter()
+
+    @property
+    def graphics(self) -> GraphicsAdapter:
+        return self._gfx
+
+    @property
+    def input(self) -> InputAdapter:
+        return self._inp
+
+    def start_loop(self, tick_func: Callable[[], bool], interval_ms: int = 50) -> None:
+        interval_sec = interval_ms / 1000.0
+        while True:
+            start = time.perf_counter()
+            if tick_func():
+                break
+            elapsed = time.perf_counter() - start
+            remaining = interval_sec - elapsed
+            if remaining > 0:
+                time.sleep(remaining)
+
+    def quit(self) -> None:
+        pygame.quit()

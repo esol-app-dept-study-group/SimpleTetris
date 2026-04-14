@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
 import tkinter
+import pygame
+
 
 # ============================================================
 # ViewModel 層: 描画領域ごとの純粋なデータ
@@ -272,3 +274,75 @@ class TkinterGraphicsAdapter(GraphicsAdapter):
 
         self.canvas.delete("all")
         self.canvas.create_text(0, 0, anchor="nw", text="\n".join(lines), font=("Courier",))
+
+
+# ============================================================
+# PygameGraphicsAdapter
+# ============================================================
+class PygameGraphicsAdapter(GraphicsAdapter):
+    """ViewModel を受け取って Pygame に描画する"""
+
+    BLOCK_WIDTH = 20
+    BLOCK_HEIGHT = 20
+
+    def __init__(self, screen: pygame.surface):
+        self.screen = screen
+        self._matrix_vm: Optional[MatrixViewModel] = None
+        self._piece_vm:  Optional[ActivePieceViewModel] = None
+        self._score_vm:  Optional[ScoreViewModel] = None
+        self._next_vm:   Optional[NextMinoViewModel] = None
+
+    def begin_frame(self) -> None:
+        self._matrix_vm = None
+        self._piece_vm  = None
+        self._score_vm  = None
+        self._next_vm   = None
+
+    def draw_matrix(self, vm: MatrixViewModel) -> None:
+        self._matrix_vm = vm
+
+    def draw_active_piece(self, vm: ActivePieceViewModel) -> None:
+        self._piece_vm = vm
+
+    def draw_score(self, vm: ScoreViewModel) -> None:
+        self._score_vm = vm
+
+    def draw_next(self, vm: NextMinoViewModel) -> None:
+        self._next_vm = vm
+
+    def end_frame(self) -> None:
+        self.screen.fill((0, 0, 0))
+        font = pygame.font.Font(None, 24)
+        if self._score_vm:
+            score_text = font.render(f"SCORE: {self._score_vm.score}   LINES: {self._score_vm.lines}   LEVEL: {self._score_vm.level}   GOAL: {self._score_vm.goal}", True, (255, 255, 255))
+            self.screen.blit(score_text, (10, 450))
+        
+        if self._matrix_vm:
+            for rowindex, row in enumerate(self._matrix_vm.cells):
+                for colindex, cell in enumerate(row):
+                    if cell == 0:
+                        block = pygame.Rect(
+                            self.BLOCK_WIDTH * colindex,
+                            self.BLOCK_HEIGHT * rowindex,
+                            self.BLOCK_WIDTH - 1,
+                            self.BLOCK_HEIGHT - 1)
+                        pygame.draw.rect(self.screen, (255, 255, 255), block)
+                    elif cell == 1:
+                        block = pygame.Rect(
+                            self.BLOCK_WIDTH * colindex,
+                            self.BLOCK_HEIGHT * rowindex,
+                            self.BLOCK_WIDTH - 1,
+                            self.BLOCK_HEIGHT - 1)
+                        pygame.draw.rect(self.screen, (0, 255, 0), block)
+                    else:
+                        block = pygame.Rect(
+                            self.BLOCK_WIDTH * colindex,
+                            self.BLOCK_HEIGHT * rowindex,
+                            self.BLOCK_WIDTH - 1,
+                            self.BLOCK_HEIGHT - 1)
+                        pygame.draw.rect(self.screen, (255, 0, 0), block)
+        if self._score_vm and self._score_vm.game_over:
+            message_text = font.render("=== GAME OVER ===", True, (255, 255, 255))
+            self.screen.blit(message_text, (10, 500))
+        pygame.display.flip()
+

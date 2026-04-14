@@ -1,7 +1,7 @@
 import itertools
 import random
 
-from TetriminoDef import TetriminoType
+from SimpleTetris.TetriminoDef import TetriminoType
 
 # 5040通り
 all_patterns = list(itertools.permutations(TetriminoType))

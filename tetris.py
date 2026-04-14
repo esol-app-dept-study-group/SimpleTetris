@@ -14,7 +14,7 @@ if __package__ is None or __package__ == "":
         sys.path.remove(pkg_dir)
     sys.path.insert(0, parent_dir)
     __package__ = "SimpleTetris"
-from SimpleTetris.AbstractModule.Platform import TkinterPlatform, ConsolePlatform, ConsolePygamePlatform
+from SimpleTetris.AbstractModule.Platform import TkinterPlatform, ConsolePlatform, ConsolePygamePlatform, PygamePlatform
 from SimpleTetris.GameModel import GameModel
 from SimpleTetris.GameView import GameView
 from SimpleTetris.GameUpdater import GameUpdater
@@ -24,9 +24,10 @@ from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
 # メインループ
 # ============================================================
 def run():
-    platform = TkinterPlatform()          # ここを差し替えるだけでバックエンドが切り替わる
+    #platform = TkinterPlatform()          # ここを差し替えるだけでバックエンドが切り替わる
     #platform = ConsolePlatform()           # ここを差し替えるだけでバックエンドが切り替わる
     #platform = ConsolePygamePlatform()      # ここを差し替えるだけでバックエンドが切り替わる
+    platform = PygamePlatform()           # ここを差し替えるだけでバックエンドが切り替わる
 
     model = GameModel.initial()
     updater = GameUpdater()
