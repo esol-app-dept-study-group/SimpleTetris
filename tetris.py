@@ -55,4 +55,5 @@ def run_gameloop_once(model, updater, view, input_adapter, eventbus):
     return False
 
 if __name__ == "__main__":
+    import sys; print(sys.executable)
     run()

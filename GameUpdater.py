@@ -18,5 +18,5 @@ class GameUpdater:
 
     def __call__(self, state: GameModel, event: EventBus) -> GameModel:
         for updater in self.subUpdaterList:
-            state = updater(state, event)
+            state = updater(state, event, updater._compute_elapsed_ms())
         return state

@@ -7,7 +7,7 @@ from SimpleTetris.GameLogicNextMino.NextMinoPermutation import get_random_permut
 
 class GameLogicNextMinoUpdater(UpdaterBase):
 
-    def __call__(self, state: GameModel, event: EventBus) -> GameModel:
+    def __call__(self, state: GameModel, event: EventBus, elapsed_time:float) -> GameModel:
         # ネクストミノが7以下になったら7つミノを補充する
         self.refill_mino(state)
         return state

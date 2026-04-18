@@ -10,7 +10,7 @@ GAME_LEVEL_MAX = 15
 GAME_LEVEL_UP_LINES = 10
 
 class GameLogicLevelUpdater(UpdaterBase):
-    def __call__(self, state: GameModel, event: EventBus) -> GameModel:
+    def __call__(self, state: GameModel, event: EventBus, elapsed_time:float) -> GameModel:
         for ev in event.poll():
             if ev == GameEvent.INPUTEVENT_TICK:
                 # 【仮実装】実際はラインクリアのイベントが来ると思うがTICKでお試し。

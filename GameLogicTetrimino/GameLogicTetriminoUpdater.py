@@ -4,7 +4,7 @@ from SimpleTetris.GameModel import GameModel
 from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
 
 class GameLogicTetriminoUpdater(UpdaterBase):
-    def __call__(self, state: GameModel, event: EventBus) -> GameModel:
+    def __call__(self, state: GameModel, event: EventBus, elapsed_time:float) -> GameModel:
         for ev in event.poll():
             if (ev == GameEvent.INPUTEVENT_INITIALIZED) or (ev == GameEvent.INPUTEVENT_TETRIMINO_LOCKDOWN):
                 # 新しいテトリミノを生成して、落下開始位置に置く
