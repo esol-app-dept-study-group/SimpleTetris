@@ -282,8 +282,29 @@ class TkinterGraphicsAdapter(GraphicsAdapter):
 class PygameGraphicsAdapter(GraphicsAdapter):
     """ViewModel を受け取って Pygame に描画する"""
 
-    BLOCK_WIDTH = 20
-    BLOCK_HEIGHT = 20
+    # 描画基準座標
+    BLOCK_WIDTH = 25
+    BLOCK_HEIGHT = 25
+    MATRIX_POSITION_X = 125
+    MATRIX_POSITION_Y = 50
+
+    # 描画色
+    COLOR_BACKGROUND = (0, 0, 0)
+    COLOR_TEXT = (255, 255, 255)
+    COLOR_BLOCK_O = (255, 255, 0)
+    COLOR_BLOCK_I = (0, 255, 255)
+    COLOR_BLOCK_T = (255, 0, 255)
+    COLOR_BLOCK_L = (255, 128, 0)
+    COLOR_BLOCK_J = (0, 0, 255)
+    COLOR_BLOCK_S = (0, 255, 0)
+    COLOR_BLOCK_Z = (255, 0, 0)
+    COLOR_NONE = (255, 255, 255)
+    # 【仮実装】最終的にはブロックの種類によって色を変える。
+    COLOR_MAP = {
+        0: COLOR_NONE,
+        1: COLOR_BLOCK_S,
+        2: COLOR_BLOCK_Z,
+    }
 
     def __init__(self, screen: pygame.surface):
         self.screen = screen
@@ -311,38 +332,34 @@ class PygameGraphicsAdapter(GraphicsAdapter):
         self._next_vm = vm
 
     def end_frame(self) -> None:
-        self.screen.fill((0, 0, 0))
+        self.screen.fill(self.COLOR_BACKGROUND)
         font = pygame.font.Font(None, 24)
+
+        # Score等のゲームデータ表示
         if self._score_vm:
-            score_text = font.render(f"SCORE: {self._score_vm.score}   LINES: {self._score_vm.lines}   LEVEL: {self._score_vm.level}   GOAL: {self._score_vm.goal}", True, (255, 255, 255))
-            self.screen.blit(score_text, (10, 450))
+            score_text = font.render(f"SCORE:", True, self.COLOR_TEXT)
+            self.screen.blit(score_text, (25, 50))
+            score_text = font.render(f"{self._score_vm.score}", True, self.COLOR_TEXT)
+            self.screen.blit(score_text, (50, 75))
+            lines_text = font.render(f"LINES: {self._score_vm.lines}", True, self.COLOR_TEXT)
+            self.screen.blit(lines_text, (25, 100))
+            level_text = font.render(f"LEVEL: {self._score_vm.level}", True, self.COLOR_TEXT)
+            self.screen.blit(level_text, (25, 125))
+            goal_text = font.render(f"GOAL: {self._score_vm.goal}", True, self.COLOR_TEXT)
+            self.screen.blit(goal_text, (25, 150))
         
+        # Matrixの描画
         if self._matrix_vm:
             for rowindex, row in enumerate(self._matrix_vm.cells):
                 for colindex, cell in enumerate(row):
-                    if cell == 0:
-                        block = pygame.Rect(
-                            self.BLOCK_WIDTH * colindex,
-                            self.BLOCK_HEIGHT * rowindex,
-                            self.BLOCK_WIDTH - 1,
-                            self.BLOCK_HEIGHT - 1)
-                        pygame.draw.rect(self.screen, (255, 255, 255), block)
-                    elif cell == 1:
-                        block = pygame.Rect(
-                            self.BLOCK_WIDTH * colindex,
-                            self.BLOCK_HEIGHT * rowindex,
-                            self.BLOCK_WIDTH - 1,
-                            self.BLOCK_HEIGHT - 1)
-                        pygame.draw.rect(self.screen, (0, 255, 0), block)
-                    else:
-                        block = pygame.Rect(
-                            self.BLOCK_WIDTH * colindex,
-                            self.BLOCK_HEIGHT * rowindex,
-                            self.BLOCK_WIDTH - 1,
-                            self.BLOCK_HEIGHT - 1)
-                        pygame.draw.rect(self.screen, (255, 0, 0), block)
+                    color = self.COLOR_MAP.get(cell)
+                    block = pygame.Rect(
+                        self.BLOCK_WIDTH * colindex + self.MATRIX_POSITION_X,
+                        self.BLOCK_HEIGHT * rowindex + self.MATRIX_POSITION_Y,
+                        self.BLOCK_WIDTH - 1,
+                        self.BLOCK_HEIGHT - 1)
+                    pygame.draw.rect(self.screen, color, block)
         if self._score_vm and self._score_vm.game_over:
-            message_text = font.render("=== GAME OVER ===", True, (255, 255, 255))
+            message_text = font.render("=== GAME OVER ===", True, self.COLOR_TEXT)
             self.screen.blit(message_text, (10, 500))
         pygame.display.flip()
-
