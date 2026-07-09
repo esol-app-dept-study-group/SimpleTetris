@@ -5,15 +5,17 @@ from SimpleTetris.GameModel import GameModel
 from SimpleTetris.GameLogicLevel.GameLogicLevelUpdater import GameLogicLevelUpdater
 from SimpleTetris.GameLogicTetrimino.GameLogicTetriminoUpdater import GameLogicTetriminoUpdater
 from SimpleTetris.GameLogicNextMino.GameLogicNextMinoUpdater import GameLogicNextMinoUpdater
-
+from SimpleTetris.GameLogicMatrix.GameLogicMatrixUpdater import GameLogicMatrixUpdater
+from SimpleTetris.GameLogicScore.GameLogicScoreUpdater import GameLogicScoreUpdater
 
 class GameUpdater:
     def __init__(self):
         self.subUpdaterList = [
-            SampleUpdater(),
             GameLogicLevelUpdater(),
             GameLogicNextMinoUpdater(),
             GameLogicTetriminoUpdater(),
+            GameLogicMatrixUpdater(),
+            GameLogicScoreUpdater(),
         ]
 
     def __call__(self, state: GameModel, event: EventBus) -> GameModel:

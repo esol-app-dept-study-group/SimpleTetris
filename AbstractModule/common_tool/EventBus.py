@@ -31,3 +31,7 @@ class EventBus:
         """すべてのキューを空にする（リセット用）."""
         self._current_tick.clear()
         self._next_tick.clear()
+    
+    def has_event(self, event: GameEvent) -> bool:
+        """前 tick で積まれた特定のイベントがあるかどうかを返す."""
+        return event in self._current_tick

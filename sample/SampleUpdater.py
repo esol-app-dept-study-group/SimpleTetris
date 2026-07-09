@@ -24,13 +24,15 @@ class SampleUpdater(UpdaterBase):
             elif ev == GameEvent.INPUTEVENT_ROTATE:
                 self._try_rotate(state)
             elif ev == GameEvent.INPUTEVENT_SOFT_DROP:
-                self._try_move(state, dx=0, dy=1)
+                pass
+                #self._try_move(state, dx=0, dy=1)
             elif ev == GameEvent.INPUTEVENT_HARD_DROP:
                 self._hard_drop(state)
             elif ev == GameEvent.INPUTEVENT_TICK:
-                moved = self._try_move(state, dx=0, dy=1)
-                if not moved:
-                    self._lock_and_spawn(state)
+                pass
+                # moved = self._try_move(state, dx=0, dy=1)
+                # if not moved:
+                #     self._lock_and_spawn(state)
 
         return state
 
@@ -55,12 +57,12 @@ class SampleUpdater(UpdaterBase):
         self._lock_and_spawn(state)
 
     def _lock_and_spawn(self, state: GameModel) -> None:
-        state.matrix.lock(state.active_piece, state.active_pos, color_id=1)
-        cleared = state.matrix.clear_lines()
-        if cleared > 0:
-            state.lines += cleared
-            state.score += cleared * 100
-
+        # state.matrix.lock(state.active_piece, state.active_pos, color_id=1)
+        # cleared = state.matrix.clear_lines()
+        # if cleared > 0:
+        #     state.lines += cleared
+        #     state.score += cleared * 100
+        
         next_kind = self._next_kind(state)
         state.active_piece = Tetromino(next_kind)
         state.active_pos = (3, 0)

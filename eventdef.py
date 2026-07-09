@@ -12,4 +12,9 @@ class GameEvent(Enum):
     INPUTEVENT_QUIT = auto()
     INPUTEVENT_LINE_CLEARED = auto()        # ラインがクリアされたときに送られるイベント
     INPUTEVENT_TETRIMINO_LOCKDOWN = auto()  # テトリミノがロックダウンしたときに送られるイベント
+    INPUTEVENT_MINO_DROPED = auto()    # 新しいテトリミノが生成されたときに送られるイベント
+    INPUTEVENT_NEXT_MINO_REFILLED = auto()  # ネクストミノが補充されたときに送られるイベント
+    INPUTEVENT_SCORE_UPDATED = auto()          # スコアが更新されたときに送られるイベント
+    INPUTEVENT_LEVEL_UPDATED = auto()          # レベルが更新されたときに送られるイベント
+    INPUTEVENT_GAME_OVER = auto()          # ゲームオーバーになったときに送られるイベント
 

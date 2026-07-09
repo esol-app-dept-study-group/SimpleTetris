@@ -19,6 +19,7 @@ from SimpleTetris.GameModel import GameModel
 from SimpleTetris.GameView import GameView
 from SimpleTetris.GameUpdater import GameUpdater
 from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
+from SimpleTetris.eventdef import GameEvent
 
 # ============================================================
 # メインループ
@@ -34,10 +35,12 @@ def run():
     view = GameView(platform.graphics)   # gfx を DI
     eventbus = EventBus()
 
+    # ゲーム開始時に一度だけ INITIALIZED を発行
+    eventbus.emit(GameEvent.INPUTEVENT_INITIALIZED)
+
     def tick() -> bool:
         return run_gameloop_once(model, updater, view, platform.input, eventbus)
-
-    platform.start_loop(tick, interval_ms=200)
+    platform.start_loop(tick, interval_ms=0)
     platform.quit()
     print("Bye!")
 
@@ -45,7 +48,8 @@ def run():
 def run_gameloop_once(model, updater, view, input_adapter, eventbus):
     view(model)
     if model.is_GameOver():
-        return True
+        events = input_adapter.get_event()   # イベントを消費してウィンドウを応答可能に保つ
+        return GameEvent.INPUTEVENT_QUIT in events
 
     # 入力イベントの詰め替え
     for event in input_adapter.get_event():
@@ -55,5 +59,4 @@ def run_gameloop_once(model, updater, view, input_adapter, eventbus):
     return False
 
 if __name__ == "__main__":
-    import sys; print(sys.executable)
     run()
