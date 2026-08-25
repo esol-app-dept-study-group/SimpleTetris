@@ -3,15 +3,32 @@ from SimpleTetris.updater_base import UpdaterBase
 from SimpleTetris.eventdef import GameEvent
 from SimpleTetris.GameModel import GameModel
 from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
-from SimpleTetris.GameLogicTetrimino.GameLogicTetriminoModel import Tetrimino, Point
 
 class GameLogicScoreUpdater(UpdaterBase):
     def __call__(self, state: GameModel, event: EventBus, elapsed_time:float) -> GameModel:
         if event.has_event(GameEvent.INPUTEVENT_TETRIMINO_LOCKDOWN) and event.has_event(GameEvent.INPUTEVENT_HARD_DROP):
-            # Hard Drop ‚Å Lockdown ‚µ‚½ê‡AƒXƒRƒA‚ğ‰ÁZ‚·‚é
+            # Hard Drop ã§ Lockdown ã—ãŸå ´åˆã€ã‚¹ã‚³ã‚¢ã‚’åŠ ç®—ã™ã‚‹.
+            state.score += self.calc_score_hard_drop(state)
             pass
         elif event.has_event(GameEvent.INPUTEVENT_TETRIMINO_LOCKDOWN) and event.has_event(GameEvent.INPUTEVENT_LINE_CLEARED):
-            # Lockdown ‚©‚Â LINE_CLEARED ‚È‚çAÁ‚¦‚½ƒ‰ƒCƒ“•ª‚ğƒXƒRƒA‚É‰ÁZ‚·‚é
+            # Lockdown ã‹ã¤ LINE_CLEARED ãªã‚‰ã€æ¶ˆãˆãŸãƒ©ã‚¤ãƒ³åˆ†ã‚’ã‚¹ã‚³ã‚¢ã«åŠ ç®—ã™ã‚‹.
+            state.score += self.calc_score_line_cleared(state)
             pass
         return state
     
+    # Hard Dropã§ãƒ­ãƒƒã‚¯ãƒ€ã‚¦ãƒ³ã—ãŸæ™‚ã®ã‚¹ã‚³ã‚¢ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°.
+    def calc_score_hard_drop(self, state: GameModel) -> int:
+        ret = state.drop_delta * 2
+        return ret
+    
+    # ç¾åœ¨ã®ãƒ¬ãƒ™ãƒ«ã¨æ¶ˆãˆãŸãƒ©ã‚¤ãƒ³æ•°ã«å¿œã˜ã¦ã‚¹ã‚³ã‚¢ã‚’è¿”ã™é–¢æ•°.
+    def calc_score_line_cleared(self, state: GameModel) -> int:
+        match state.cleared_lines:
+            case 1:
+                return 100 * state.level
+            case 2:
+                return 300 * state.level
+            case 3:
+                return 500 * state.level
+            case 4:
+                return 800 * state.level
