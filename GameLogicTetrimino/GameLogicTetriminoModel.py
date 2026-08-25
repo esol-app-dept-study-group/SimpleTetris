@@ -52,6 +52,16 @@ TETRIMINO_SHAPES: Dict[str, List[List[Point]]] = {
 
 TETRIMINO_KINDS = list(TETRIMINO_SHAPES.keys())
 
+TETRIMINO_DEFAULT_FALL_POS = {
+    'I': (4, 0),
+    'O': (5, 0),
+    'T': (4, 0),
+    'J': (4, 0),
+    'L': (4, 0),
+    'S': (4, 0),
+    'Z': (4, 0),
+}
+
 class GameLogicTetriminoModel:
     CurrentMino: TetriminoType
     x: int

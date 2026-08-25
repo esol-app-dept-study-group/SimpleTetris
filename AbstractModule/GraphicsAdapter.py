@@ -299,11 +299,27 @@ class PygameGraphicsAdapter(GraphicsAdapter):
     COLOR_BLOCK_S = (0, 255, 0)
     COLOR_BLOCK_Z = (255, 0, 0)
     COLOR_NONE = (255, 255, 255)
-    # 【仮実装】最終的にはブロックの種類によって色を変える。
+
+    # Model.grid は ViewModel.cells に直接変換されるため
+    # セルごとの値は下記の値であり、意味は等しい
+    #    EMPTY = 0
+    #    I_CYAN = 1
+    #    O_YELLOW = 2
+    #    T_PURPLE = 3
+    #    S_GREEN = 4
+    #    Z_RED = 5
+    #    J_BLUE = 6
+    #    L_ORANGE = 7
+
     COLOR_MAP = {
         0: COLOR_NONE,
-        1: COLOR_BLOCK_S,
-        2: COLOR_BLOCK_Z,
+        1: COLOR_BLOCK_I,
+        2: COLOR_BLOCK_O,
+        3: COLOR_BLOCK_T,
+        4: COLOR_BLOCK_S,
+        5: COLOR_BLOCK_Z,
+        6: COLOR_BLOCK_J,
+        7: COLOR_BLOCK_L,
     }
 
     def __init__(self, screen: pygame.surface):
@@ -347,12 +363,15 @@ class PygameGraphicsAdapter(GraphicsAdapter):
             self.screen.blit(level_text, (25, 125))
             goal_text = font.render(f"GOAL: {self._score_vm.goal}", True, self.COLOR_TEXT)
             self.screen.blit(goal_text, (25, 150))
-        
+
         # Matrixの描画
         if self._matrix_vm:
             for rowindex, row in enumerate(self._matrix_vm.cells):
                 for colindex, cell in enumerate(row):
                     color = self.COLOR_MAP.get(cell)
+                    if color is None:
+                        color = self.COLOR_NONE
+                        print("Warning: Unknown color_id, using COLOR_NONE")
                     block = pygame.Rect(
                         self.BLOCK_WIDTH * colindex + self.MATRIX_POSITION_X,
                         self.BLOCK_HEIGHT * rowindex + self.MATRIX_POSITION_Y,

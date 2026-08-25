@@ -2,6 +2,7 @@ from SimpleTetris.updater_base import UpdaterBase
 from SimpleTetris.eventdef import GameEvent
 from SimpleTetris.GameModel import GameModel
 from SimpleTetris.AbstractModule.common_tool.EventBus import EventBus
+from SimpleTetris.GameLogicTetrimino.GameLogicTetriminoModel import TETRIMINO_DEFAULT_FALL_POS, Tetrimino   
 
 class GameLogicTetriminoUpdater(UpdaterBase):
     def __init__(self):
@@ -12,8 +13,8 @@ class GameLogicTetriminoUpdater(UpdaterBase):
         super().__init__()
 
     def __call__(self, state: GameModel, event: EventBus, elapsed_time:float) -> GameModel:
-        result = None
         for ev in event.poll():
+            result = None
             if ev == GameEvent.INPUTEVENT_INITIALIZED:
                 # 新しいテトリミノを生成して、落下開始位置に置く
                 self.create_new_piece(state)
@@ -29,25 +30,26 @@ class GameLogicTetriminoUpdater(UpdaterBase):
                 fall_speed_ms = state.get_fall_speed_ms()
                 if self._drop_accumulator_ms >= fall_speed_ms:
                     self._drop_accumulator_ms -= fall_speed_ms
-                result = self.move_piece(state, ev, elapsed_time)
+                    result = self.move_piece(state, ev, elapsed_time)
             elif ev == GameEvent.INPUTEVENT_ROTATE:
                 self.rotate_piece(state)
             elif ev == GameEvent.INPUTEVENT_QUIT:
                 state.game_over = True
             # Lockdownしたか？
-            if result == GameEvent.INPUTEVENT_MINO_DROPED:
+            if result == GameEvent.INPUTEVENT_NEW_ACTIVE_MINO_CREATED:
                 # Lockdown したら、テトリミノ生成済みイベント発行し、Matrix の更新を行う
-                event.emit(GameEvent.INPUTEVENT_MINO_DROPED)
+                event.emit(GameEvent.INPUTEVENT_NEW_ACTIVE_MINO_CREATED)
                 
         return state
 
     """
     新規のテトリミノを生成して、落下開始位置に置く。
     """
-    def create_new_piece(self, state: GameModel) -> GameModel:
-        # NextMino から新しいテトリミノの種類を取り出して
-        # 
-        return state
+    def create_new_piece(self, state: GameModel) -> None:
+        # NextMino から新しいテトリミノの種類を取り出して初期位置に設置
+        tetromino_kind = state.next_queue.pop()
+        state.active_piece = Tetrimino(tetromino_kind)
+        state.active_pos = TETRIMINO_DEFAULT_FALL_POS[tetromino_kind]
 
     """
     キー入力に従ってテトリミノを移動させる。
@@ -73,15 +75,21 @@ class GameLogicTetriminoUpdater(UpdaterBase):
         elif ev == GameEvent.INPUTEVENT_TICK:
             moved = self._try_move(state, dx=0, dy=self._C_MOVE_DROP_Y_DELTA)
             if not moved:
+                self.update_last_lockdown_info(state)
                 self.create_new_piece(state)
-                return GameEvent.INPUTEVENT_MINO_DROPED
+                return GameEvent.INPUTEVENT_NEW_ACTIVE_MINO_CREATED
         return ret
 
     """
     キー入力に従ってテトリミノを回転させる。
     """
     def rotate_piece(self, state: GameModel) -> None:
-        pass
+        rotated = state.active_piece.rotated(+1)
+        if state.matrix.can_place(rotated, state.active_pos):
+            state.active_piece = rotated
+        else:
+            # 回転できない場合は何もしない
+            pass
 
     """
     キー入力に従ってテトリミノを移動させる。
@@ -100,3 +108,7 @@ class GameLogicTetriminoUpdater(UpdaterBase):
         if cleared > 0:
             state.lines += cleared
             state.score += cleared * 100
+
+    def update_last_lockdown_info(self, state: GameModel) -> None:
+        state.last_lockdown_piece = state.active_piece
+        state.last_lockdown_pos = state.active_pos

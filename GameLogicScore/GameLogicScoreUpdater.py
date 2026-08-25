@@ -23,7 +23,7 @@ class GameLogicScoreUpdater(UpdaterBase):
     
     # 現在のレベルと消えたライン数に応じてスコアを返す関数.
     def calc_score_line_cleared(self, state: GameModel) -> int:
-        match state.cleared_lines:
+        match state.last_lines_cleared:
             case 1:
                 return 100 * state.level
             case 2:
